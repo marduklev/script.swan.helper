@@ -72,11 +72,13 @@ def main():
         property = sys.argv[3].split('=')[1]
         decode(KNAME,KVALUE,property)
         
-    # elif ACTION == 'createselect':
-        # createselect(KNAME,KVALUE)
+    elif ACTION == 'textviewer':
+        # should be ESC INFO, or set Quotes in call
+        text = sys.argv[3].split('"')[1]
+        DIALOG.textviewer(f'{KVALUE}', f'{text}')
     
     else:
-        print('error')
+        xbmc.executebuiltin('notification(log,  %s  %s  %s)' % (ACTION,KNAME,KVALUE))
 
 
 if __name__ == '__main__':
