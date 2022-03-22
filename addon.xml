@@ -13,7 +13,7 @@
 		<news></news>
 		<source></source>
 		<forum></forum>
-		<license>The MIT License</license>
+		<license>GNU GENERAL PUBLIC LICENSE Version 2.0</license>
 		<platform>all</platform>
 		<assets>
 			<icon>resources/icon.png</icon>
