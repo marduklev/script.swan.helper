@@ -2,14 +2,58 @@
 <addon id="script.swan.helper" name="swan skinning tools" version="0.0.03" provider-name="marduk">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
-		<import addon="xbmc.json" version="6.20.0" />
 	</requires>
+	<extension point="kodi.context.item">
+		<menu id="kodi.core.main">
+			<item library="contextmenu.py" args="playlistitem_fn,method=minus">
+				<label>$LOCALIZE[13332]</label>
+				<visible>string.isequal(window(home).property(playlist_itemcontrol),enable)</visible>
+			</item>
+			<item library="contextmenu.py" args="playlistitem_fn,method=plus">
+				<label>$LOCALIZE[13333]</label>
+				<visible>string.isequal(window(home).property(playlist_itemcontrol),enable)</visible>
+			</item>
+			<item library="contextmenu.py" args="playlistitem_fn,method=delete">
+				<label>$LOCALIZE[15015]</label>
+				<visible>string.isequal(window(home).property(playlist_itemcontrol),enable)</visible>
+			</item>
+			<item library="contextmenu.py" args="queue,method=insert">
+				<label>$LOCALIZE[10008]</label>
+				<visible>!Window.IsMedia + [String.IsEqual(ListItem.dbtype,artist) | String.IsEqual(ListItem.dbtype,album) | String.IsEqual(ListItem.dbtype,song) | String.IsEqual(ListItem.dbtype,year) | String.IsEqual(ListItem.dbtype,originalyear) | String.IsEqual(ListItem.dbtype,genre)]</visible>
+			</item>
+			<item library="contextmenu.py" args="queue,method=add">
+				<label>$LOCALIZE[13347]</label>
+				<visible>!Window.IsMedia + [String.IsEqual(ListItem.dbtype,artist) | String.IsEqual(ListItem.dbtype,album) | String.IsEqual(ListItem.dbtype,song) | String.IsEqual(ListItem.dbtype,year) | String.IsEqual(ListItem.dbtype,originalyear) | String.IsEqual(ListItem.dbtype,genre)]</visible>
+			</item>
+			<item library="contextmenu.py" args="execute,method=playmedia_dir">
+				<label>$LOCALIZE[22083]</label>
+				<visible>[Window.IsMedia + Container.Content(Albums) + string.startswith(listitem.label, *)] | [!Window.IsMedia + [String.IsEqual(ListItem.DBtype,artist) | String.IsEqual(ListItem.DBtype,album)]]</visible>
+			</item>
+			<menu>
+				<label>$ADDON[script.playlist.helper 32000]</label>
+				<item library="contextmenu.py" args="execute,method=open_playlist">
+					<label>$LOCALIZE[13350]</label>
+					<visible>!Window.IsActive(MyPlaylist.xml) + [MusicPlayer.Offset(-1).Exists | MusicPlayer.Offset(1).Exists]</visible>
+				</item>
+				<item library="contextmenu.py" args="execute,method=save_playlist">
+					<label>$LOCALIZE[190] $LOCALIZE[559]</label>
+					<visible>!Window.IsActive(MyPlaylist.xml) + [MusicPlayer.Offset(-1).Exists | MusicPlayer.Offset(1).Exists]</visible>
+				</item>
+				<item library="contextmenu.py" args="execute,method=open_playercontrol">
+					<label>$LOCALIZE[10114]</label>
+					<visible>!Window.IsActive(playercontrols) + [Player.HasMedia + [MusicPlayer.Offset(-1).Exists | MusicPlayer.Offset(1).Exists]]</visible>
+				</item>
+			</menu>
+		</menu>
+	</extension>
 	<extension point="xbmc.python.script" library="default.py">
 		<provides>executable</provides>
 	</extension>
+	<!-- 
 	<extension point="xbmc.python.pluginsource" library="plugin.py">
 		<provides>video</provides>
 	</extension>
+	-->
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en_GB">summary</summary>
 		<description lang="en_GB">description</description>
