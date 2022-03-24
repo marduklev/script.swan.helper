@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.swan.helper" name="skin.swan helper scrips" version="0.0.03" provider-name="marduk">
+<addon id="script.swan.helper" name="S W A N  helper scrips" version="0.0.03" provider-name="marduk">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 	</requires>
@@ -30,7 +30,7 @@
 				<visible>[Window.IsMedia + Container.Content(Albums) + string.startswith(listitem.label, *)] | [!Window.IsMedia + [String.IsEqual(ListItem.DBtype,artist) | String.IsEqual(ListItem.DBtype,album)]]</visible>
 			</item>
 			<menu>
-				<label>$ADDON[script.playlist.helper 32000]</label>
+				<label>$ADDON[script.swan.helper 32000]</label>
 				<item library="contextmenu.py" args="execute,method=open_playlist">
 					<label>$LOCALIZE[13350]</label>
 					<visible>!Window.IsActive(MyPlaylist.xml) + [MusicPlayer.Offset(-1).Exists | MusicPlayer.Offset(1).Exists]</visible>

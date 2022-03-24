@@ -1,0 +1,49 @@
+# Kodi Media Center language file
+# Addon Name: S W A N  helper scrips
+# Addon id: script.swan.helper
+# Addon Provider: marduk
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: xx\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: myself\n"
+"Language-Team: English (xxteam)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#32000"
+msgid "Playlist Context Addon"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Playlist Context Addon 1"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Playlist Context Addon 2"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Playlist Context Addon 3"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Playlist Context Addon 4"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Playlist Context Addon 5"
+msgstr ""
+
+msgctxt "#32050"
+msgid "Playback Previous Title"
+msgstr ""
+
+msgctxt "#32051"
+msgid "Playback Next Title"
+msgstr ""
