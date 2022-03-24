@@ -4,28 +4,12 @@ import xbmcaddon
 
 import sys
 
-def log(logmsg):
-    # level = xbmc.LOGDEBUG , xbmc.LOGINFO ...
-    level = True
-    xbmc.log(logmsg , level)
-
-def main():
-    if ACTION == 'queue':
-        playlist_queuing()
-
-    if ACTION == 'execute':
-        execute()
-    
-    if ACTION == 'playlistitem_fn':
-        playlistitem_fn()
-    
 def playlistitem_fn():
     container_id = xbmc.getInfoLabel('system.currentcontrolid')
     position1 = int(xbmc.getInfoLabel('container(%s).currentitem' % container_id)) - 1
     size = int(PLAYLIST.size()) - 1
     
     xbmc.executebuiltin('setproperty(playlist_updating,true,home)')
-    
     
     if METHOD == 'minus':
         if position1 == 0:
@@ -41,17 +25,15 @@ def playlistitem_fn():
     
     if METHOD == 'minus' or METHOD == 'plus':
         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Playlist.Swap", "params": { "playlistid": %s, "position1": %s, "position2": %s }, "id": 1}' % (PLAYLIST_ID,position1,position2))
-        xbmc.executebuiltin('setfocus(%s,%s)' % (container_id,position2))
+        # xbmc.executebuiltin('setfocus(%s,%s)' % (container_id,position2))
     
     if METHOD == 'delete':
         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id": 1, "method": "Playlist.Remove", "params": { "playlistid": %s, "position": %s}}' % (PLAYLIST_ID,position1))
-        xbmc.executebuiltin('setfocus(%s,%s)' % (container_id,position1))
+        # xbmc.executebuiltin('setfocus(%s,%s)' % (container_id,position1))
     
     # need some small delay: focusd n refresh list, otherwise prop is cleared and list not refreshed, also Control 7000 in window 11140 has been asked to focus, but it can't
     xbmc.sleep(100)
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
-    
-    log('playlistitem_fn msg')
     
 def execute(): 
     # context_actions.py
@@ -75,8 +57,6 @@ def execute():
     
     if METHOD == 'open_playercontrol':
         xbmc.executebuiltin('activatewindow(playercontrols)')
- 
-    log('execute msg')
 
 def playlist_queuing():
     dbid = xbmc.getInfoLabel('listItem.dbid') if xbmc.getCondVisibility('!string.isempty(listitem.dbid)') else 0
@@ -112,8 +92,16 @@ def playlist_queuing():
         xbmc.Player().play(PLAYLIST)
     
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
+
+def main():
+    if ACTION == 'queue':
+        playlist_queuing()
+
+    if ACTION == 'execute':
+        execute()
     
-    log('playlist_queuing msg')
+    if ACTION == 'playlistitem_fn':
+        playlistitem_fn()
 
 if __name__ == '__main__':
     ADDON = xbmcaddon.Addon()
@@ -122,7 +110,7 @@ if __name__ == '__main__':
     PLAYLIST_ID = 1 if xbmc.getCondVisibility('player.hasvideo') else 0
     PLAYLIST = xbmc.PlayList(PLAYLIST_ID)
     
-    # xml syn used args="queue,method=add"
+    # xml syn used args="queue,method=add" , COMMA gets ignored n result in 1 arg contain comma
     ACTION = sys.argv[1].split(',method=')[0]
     METHOD = sys.argv[1].split(',method=')[1]
     

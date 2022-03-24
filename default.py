@@ -30,10 +30,8 @@ def playoffset():
     playlist = xbmc.PlayList(playlistid)   
     container_id = xbmc.getInfoLabel('system.currentcontrolid')
     current = playlist.getposition()
-    # py 3.6 selected = int(xbmc.getInfoLabel(f'container({container_id}).currentitem')) - 1
     selected = int(xbmc.getInfoLabel('container(%s).currentitem' % container_id)) - 1
     index = int(selected) - int(current)
-    # py 3.6 xbmc.executebuiltin(f'playlist.playoffset({index})')
     xbmc.executebuiltin('playlist.playoffset(%s)' % (index))
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
     
@@ -110,8 +108,8 @@ def main():
         log(f'Addon: {ADDON_ID}\n ACTION: {ACTION}\n KNAME: {KNAME}\n KVALUE: {KVALUE}\n KNAME3: {KNAME3}\n KVALUE3: {KVALUE3}')
 
 def log(logmsg):
-    # level = xbmc.LOGDEBUG , xbmc.LOGINFO ...
-    level = True
+    # level = xbmc.LOGDEBUG , xbmc.LOGINFO , leia xbmc.LOGNOTICE in matrix : xbmc.LOGINFO - integer, not bool?
+    level = xbmc.LOGINFO
     xbmc.log(logmsg , level)
     
 if __name__ == '__main__':

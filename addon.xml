@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.swan.helper" name="swan skinning tools" version="0.0.03" provider-name="marduk">
+<addon id="script.swan.helper" name="skin.swan helper scrips" version="0.0.03" provider-name="marduk">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0" />
 	</requires>
@@ -49,7 +49,7 @@
 	<extension point="xbmc.python.script" library="default.py">
 		<provides>executable</provides>
 	</extension>
-	<!-- 
+	<!-- https://kodi.wiki/view/HOW-TO:Video_addon
 	<extension point="xbmc.python.pluginsource" library="plugin.py">
 		<provides>video</provides>
 	</extension>
