@@ -12,19 +12,19 @@ import sys
 def decode(source=None,property='decoded_string'):
     result = urllib.parse.unquote(source)
     xbmc.executebuiltin("SetProperty(%s,%s,home)" % (property,result))
-    log(f'Addon: {ADDON_ID}\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME3}\n param2 value: {KVALUE3} is : {result} ')
+    log(f'Addon: {ADDON_ID}\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} is : {result} ')
   
 def encode(source=None,property='encoded_string'):
     result = urllib.parse.quote(source.encode())
     xbmc.executebuiltin("SetProperty(%s,%s,home)" % (property,result))   
-    log(f'Addon: {ADDON_ID}\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME3}\n param2 value: {KVALUE3} is : {result} ')
+    log(f'Addon: {ADDON_ID}\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} is : {result} ')
 
 def checkexist(file=None,property='filesearch_result'):
     if xbmcvfs.exists(file):
         xbmc.executebuiltin("SetProperty(%s,%s,home)" % (property,file))
-    log(f'Addon: {ADDON_ID}\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME3}\n param2 value: {KVALUE3}')
-    
-def playoffset():
+    log(f'Addon: {ADDON_ID}\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2}')
+
+def playlist_playoffset():
     xbmc.executebuiltin('setproperty(playlist_updating,true,home)')
     playlistid = 1 if xbmc.getCondVisibility('player.hasvideo') else 0
     playlist = xbmc.PlayList(playlistid)   
@@ -37,7 +37,7 @@ def playoffset():
     
     log('playoffset msg')
 
-def defaultselect_mediaitem():
+def select():
     playlistid = 1 if xbmc.getCondVisibility('player.hasvideo') else 0
     playlist = xbmc.PlayList(0)
     
@@ -82,33 +82,13 @@ def defaultselect_mediaitem():
             xbmc.executebuiltin('notification($LOCALIZE[625] %s: %s,  Added to Playlist at position %s,,%s)' % (dbtype,item_label,index,item_thumb)) 
 
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
-
     log('defaultselect_mediaitem msg')
-    
-def main():
-    if ACTION == 'checkexist':
-        checkexist(KVALUE,KVALUE3)
-    
-    elif ACTION == 'select':
-        defaultselect_mediaitem()
-    
-    elif ACTION == 'playlist_playoffset':
-        playoffset()
-    
-    elif ACTION == 'encode':
-        encode(KVALUE,KVALUE3)
-    
-    elif ACTION == 'decode':
-        decode(KVALUE,KVALUE3)
-        
-    elif ACTION == 'textviewer':
-        DIALOG.textviewer(KVALUE, KVALUE3[2:-2])
-    
-    else:
-        log(f'Addon: {ADDON_ID}\n ACTION: {ACTION}\n KNAME: {KNAME}\n KVALUE: {KVALUE}\n KNAME3: {KNAME3}\n KVALUE3: {KVALUE3}')
 
+def textviewer(header='header',txt='txt'):
+    txt = txt[2:-2]
+    DIALOG.textviewer(f'{header}',f'{txt}')
+    
 def log(logmsg):
-    # level = xbmc.LOGDEBUG , xbmc.LOGINFO , leia xbmc.LOGNOTICE in matrix : xbmc.LOGINFO - integer, not bool?
     level = xbmc.LOGINFO
     xbmc.log(logmsg , level)
     
@@ -121,15 +101,21 @@ if __name__ == '__main__':
     ARGS = sys.argv[1:]
     ACTION = sys.argv[1].split('action=')[1]
     
-    # action.keyname - almost irrelevant codewise, just easier to set up script calls
-    
+    '''
+    docs.python.org locals | globals - used to call a function directly by value x as string itself is not callable
+        log(f'locals: {locals()}\n globals: {globals()}')
+    '''
     if len(sys.argv) > 2:
         KNAME = sys.argv[2].split('=')[0]
-        # action.keyvalue - always escaping strings for arg2
         KVALUE = sys.argv[2].split(f'{KNAME}=')[1][2:-2]
         
         if len(sys.argv) > 3:
-            KNAME3 = sys.argv[3].split('=')[0]
-            KVALUE3 = sys.argv[3].split(f'{KNAME3}=')[1]
+            KNAME2 = sys.argv[3].split('=')[0]
+            KVALUE2 = sys.argv[3].split(f'{KNAME2}=')[1]
+            locals()[ACTION](KVALUE,KVALUE2)
+            
+        else:
+            locals()[ACTION](KVALUE)
     
-    main()
+    else:
+        locals()[ACTION]()
