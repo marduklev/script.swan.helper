@@ -12,11 +12,13 @@ def force_musicvideos():
     # this will not work when advancedsettings - set jsonrpc to compactoutput false
     # may addon/skinsettigs  setting enable youtube fallback
     artist_id = xbmc.getInfoLabel('container().listItem.artist')
+    # viewmode = xbmc.getInfoLabel('Container.Viewmode')
     exist_results = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "VideoLibrary.GetMusicvideos", "params": { "filter": {"field": "artist", "operator": "is", "value": "%s"}, "limits": { "start" : 0, "end": 1 }, "properties" : ["title"] }, "id": "libMusicVideos"} ' % artist_id).find('"total":0')
     if exist_results == int(-1):
         xbmc.executebuiltin( f"activatewindow(videos,videodb://musicvideos/titles/?xsp=%7b%22rules%22%3a%7b%22and%22%3a%5b%7b%22field%22%3a%22artist%22%2c%22operator%22%3a%22contains%22%2c%22value%22%3a%5b%22{artist_id}%22%5d%7d%5d%7d%2c%22type%22%3a%22musicvideos%22%7d,return)" )
     elif exist_results == int(77) and xbmc.getCondVisibility('System.HasAddon(plugin.video.youtube)'):
         xbmc.executebuiltin( f"activatewindow(videos,plugin://plugin.video.youtube/search/?hide_folders=true&amp;q={artist_id}%2B%0Aofficial%2B%0Amusicvideos,return)" )
+        # xbmc.executebuiltin( f"Container.SetViewMode({viewmode})" )
     else:
         DIALOG.textviewer('Sorry', f'No Musicvideos by {artist_id} in your library')
     
