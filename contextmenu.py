@@ -25,16 +25,17 @@ def playlistitem_fn():
     
     if METHOD == 'minus' or METHOD == 'plus':
         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Playlist.Swap", "params": { "playlistid": %s, "position1": %s, "position2": %s }, "id": 1}' % (PLAYLIST_ID,position1,position2))
-        # xbmc.executebuiltin('setfocus(%s,%s)' % (container_id,position2))
-    
+        playlist_regainfocus(container_id,position2)
+        
     if METHOD == 'delete':
         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "id": 1, "method": "Playlist.Remove", "params": { "playlistid": %s, "position": %s}}' % (PLAYLIST_ID,position1))
-        # xbmc.executebuiltin('setfocus(%s,%s)' % (container_id,position1))
-    
-    # need some small delay: focusd n refresh list, otherwise prop is cleared and list not refreshed, also Control 7000 in window 11140 has been asked to focus, but it can't
+        playlist_regainfocus(container_id,position1)
+
+def playlist_regainfocus(container_id,index):
     xbmc.sleep(100)
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
-    
+    xbmc.executebuiltin(f'alarmclock(delayedfocus,setfocus({container_id},{index}),00:00,silent)')
+
 def execute(): 
     # context_actions.py
     if METHOD == 'playmedia_dir':
