@@ -34,7 +34,8 @@ def playlistitem_fn():
 def playlist_regainfocus(container_id,index):
     xbmc.sleep(100)
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
-    xbmc.executebuiltin(f'alarmclock(delayedfocus,setfocus({container_id},{index}),00:00,silent)')
+    xbmc.sleep(50)
+    xbmc.executebuiltin(f'setfocus({container_id},{index})')
 
 def execute(): 
     # context_actions.py

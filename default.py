@@ -25,17 +25,17 @@ def force_musicvideos():
 def decode(source=None,property='decoded_string'):
     result = urllib.parse.unquote(source)
     xbmc.executebuiltin(f"SetProperty({property},{result},home)")
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
+    # log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
 
 def encode(source=None,property='encoded_string'):
     result = urllib.parse.quote(source.encode())
     xbmc.executebuiltin("SetProperty(%s,%s,home)" % (property,result))
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
+    # log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
 
 def checkexist(file=None,property='filesearch_result'):
     if xbmcvfs.exists(file):
         xbmc.executebuiltin("SetProperty(%s,%s,home)" % (property,file))
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2}')
+    # log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2}')
 
 def playlist_playoffset():
     xbmc.executebuiltin('setproperty(playlist_updating,true,home)')
@@ -48,7 +48,7 @@ def playlist_playoffset():
     xbmc.executebuiltin('playlist.playoffset(%s)' % (index))
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
     
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}')
+    # log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}')
 
 def select():
     playlistid = 1 if xbmc.getCondVisibility('player.hasvideo') else 0
@@ -95,12 +95,12 @@ def select():
             xbmc.executebuiltin('notification($LOCALIZE[625] %s: %s,  Added to Playlist at position %s,,%s)' % (dbtype,item_label,index,item_thumb)) 
     
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}')
+    # log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}')
 
 def textviewer(header='header',txt='txt'):
     txt = txt[2:-2]
-    DIALOG.textviewer(f'{header}',f'{txt}')
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION} \n    heaer: {header}\n    txt : {txt}')
+    DIALOG.textviewer(header,txt)
+    # log(f'[ {ADDON_ID} ]\n ACTION: {ACTION} \n    heaer: {header}\n    txt : {txt}')
 
 def log(logmsg):
     level = xbmc.LOGINFO
