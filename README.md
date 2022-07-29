@@ -151,16 +151,6 @@
 		if either media window and on '. all albums' listitem entry,
 		or if not media window for artist or album items (clears playlist, and start plaing folder)
 
-
-
-KNOWN ISSUES:
-																			- there is an 'issue' when 'switch_minus' items
-				- 	when use : 'SetFocus(container_id,position,absolute)' or 'SetFocus(container_id,position)' , or 'Control.Move(container_id,-1)'
-					to focus the previous highlighted playlistitem again, 
-					forcing focus position failing if a container control is designed to less items than a playlist is filled with 
-					e.g. gui show 8 items
-						 playlist if filled with 10 items
-						 switch 0(first) to 8(last), result in wrong focus position
 						 
 TO DO:
 - hide items based upon addon setting
