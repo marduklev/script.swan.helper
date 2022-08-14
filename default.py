@@ -9,7 +9,7 @@ import urllib.parse
 import sys
 # import os
 
-def playtrailer(folderpath="",play=False):
+def get_trailer(folderpath="",play=False):
 
     files = xbmcvfs.listdir(folderpath)[1]
     
