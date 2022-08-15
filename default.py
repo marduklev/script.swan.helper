@@ -7,16 +7,14 @@ import xbmcvfs
 
 import urllib.parse
 import sys
-# import os
 
-def get_trailer(folderpath="",play=False):
-
-    files = xbmcvfs.listdir(folderpath)[1]
+def get_trailer(folderpath="",play=False,plugin=False):
+    f_localtrailer = []
+    trailer = None
     
-    '''
-        ! DONT do LIST WHEN PLUGIN CONTENT
-    '''
-    f_localtrailer = [s for s in files if "trailer" in s]
+    if plugin == False:
+        files = xbmcvfs.listdir(folderpath)[1]
+        f_localtrailer = [s for s in files if "trailer" in s]
     
     if f_localtrailer == []:
         
@@ -24,10 +22,6 @@ def get_trailer(folderpath="",play=False):
             trailer = xbmc.getInfoLabel('listitem.trailer')
             xbmc.executebuiltin(f'SetProperty(listitemtrailer,{trailer},home)')
             
-            if play == True:
-                xbmc.executebuiltin('SetProperty(trailer_isplaying,true,home)')
-                xbmc.executebuiltin(f'playmedia({trailer},1)')
-
         elif xbmc.getCondVisibility('skin.hassetting(trailer_yt_fallback)'):
             local_language = xbmc.getInfoLabel('System.Language')
             title = xbmc.getInfoLabel('listitem.title')
@@ -45,24 +39,17 @@ def get_trailer(folderpath="",play=False):
             
             xbmc.executebuiltin(f'SetProperty(listitemtrailer,{trailer},home)')
             # log(f'[ {ADDON_ID} ]\n json: {list}\n result:\n{result}\ntrailer:\n{trailer}')
-            if play == True:
-                
-                xbmc.executebuiltin('SetProperty(trailer_isplaying,true,home)')
-                xbmc.executebuiltin(f'playmedia({trailer},1)')
-
+            
     else:
-        trailer = folderpath + [s for s in files if "trailer" in s][0]
+        trailer = folderpath + f_localtrailer[0]
         xbmc.executebuiltin(f'SetProperty(listitemtrailer,{trailer},home)')
         
-        
-        
-        if play == True:
-            xbmc.executebuiltin('SetProperty(trailer_isplaying,true,home)')
-            xbmc.executebuiltin(f'playmedia({trailer},1)')
+    if play == True and trailer is not None:
+        xbmc.executebuiltin('SetProperty(trailer_isplaying,true,home)')
+        xbmc.executebuiltin(f'playmedia({trailer},1)')
     
     # log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n ')
-    # DIALOG.textviewer(f'DEBUG ACTION: {ACTION}', f'args \n path:{path} \n play:{play}')
-    
+ 
 def force_musicvideos():
     # this will not work when advancedsettings - set jsonrpc to compactoutput false
     # may addon/skinsettigs  setting enable youtube fallback
