@@ -40,7 +40,7 @@ def get_trailer(folderpath="",play=False,plugin=False):
         xbmc.executebuiltin('SetProperty(trailer_isplaying,true,home)')
         xbmc.executebuiltin(f'playmedia({trailer},1)')
     
-    log(f'[ {ADDON_ID} ]\n  ACTION: {ACTION}\n locals: {locals()}')
+    log(f'locals: {locals()}')
  
 def force_musicvideos():
     # this will not work when advancedsettings - set jsonrpc to compactoutput false
@@ -56,22 +56,22 @@ def force_musicvideos():
     else:
         DIALOG.textviewer('Sorry', f'No Musicvideos by {artist_id} in your library')
     
-    log(f'[ {ADDON_ID} ]\n  ACTION: {ACTION}\n  locals: {locals()}')
+    log(f'locals: {locals()}')
     
 def decode(source=None,property='decoded_string'):
     result = urllib.parse.unquote(source)
     xbmc.executebuiltin(f"SetProperty({property},{result},home)")
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
+    log(f'Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
 
 def encode(source=None,property='encoded_string'):
     result = urllib.parse.quote(source.encode())
     xbmc.executebuiltin(f"SetProperty({property},{result},home)")
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
+    log(f'Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
 
 def checkexist(file=None,property='filesearch_result'):
     if xbmcvfs.exists(file):
         xbmc.executebuiltin(f"SetProperty({property},{file},home)")
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2}')
+    log(f'Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2}')
 
 def playlist_playoffset():
     xbmc.executebuiltin('setproperty(playlist_updating,true,home)')
@@ -79,12 +79,12 @@ def playlist_playoffset():
     playlist = xbmc.PlayList(playlistid)   
     container_id = xbmc.getInfoLabel('system.currentcontrolid')
     current = playlist.getposition()
-    selected = int(xbmc.getInfoLabel('container(%s).currentitem' % container_id)) - 1
+    selected = int(xbmc.getInfoLabel(f'container({container_id}).currentitem')) - 1
     index = int(selected) - int(current)
     xbmc.executebuiltin(f'playlist.playoffset({index})')
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
     
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n  locals: {locals()}')
+    log(f'locals: {locals()}')
 
 def select():
     playlistid = 1 if xbmc.getCondVisibility('player.hasvideo') else 0
@@ -122,16 +122,16 @@ def select():
         else:
             xbmc.executeJSONRPC('{"jsonrpc": "2.0",  "id": 1, "method": "Playlist.Insert", "params": { "item": { "%s": "%s"}, "playlistid": %s, "position": %s}}' % (item,url,playlistid,index))
     
-    if xbmc.getCondVisibility('skin.hassetting(%s_select_queue)' % dbtype):
+    if xbmc.getCondVisibility(f'skin.hassetting({dbtype}_select_queue)'):
         if dbtype == 'song' or dbtype == 'album':
-            xbmc.executebuiltin('notification(%s %s by %s,  Added to Playlist at position %s,,%s)' % (dbtype,item_title,item_artist,index,item_thumb))
+            xbmc.executebuiltin(f'notification({dbtype} {item_title} by {item_artist},  Added to Playlist at position {index},,{item_thumb})')
         elif dbtype == 'artist':
-            xbmc.executebuiltin('notification($LOCALIZE[625] %s,  Added to Playlist at position %s,,%s)' % (item_artist,index,item_thumb))
+            xbmc.executebuiltin(f'notification($LOCALIZE[625] {item_artist},  Added to Playlist at position {index},,{item_thumb})')
         else:
-            xbmc.executebuiltin('notification($LOCALIZE[625] %s: %s,  Added to Playlist at position %s,,%s)' % (dbtype,item_label,index,item_thumb)) 
+            xbmc.executebuiltin(f'notification($LOCALIZE[625] {dbtype}: {item_label},  Added to Playlist at position {index},,{item_thumb})') 
     
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
-    log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n  locals: {locals()}')
+    log(f'[locals: {locals()}')
 
 def textviewer(header='header',txt='txt'):
     DIALOG.textviewer(header,txt[2:-2])
@@ -140,7 +140,7 @@ def textviewer(header='header',txt='txt'):
 def log(logmsg):
     if ADDON.getSettingBool('debug_log') == True:
         level = xbmc.LOGINFO
-        xbmc.log(f'\n{logmsg}\n' , level)
+        xbmc.log(f'[ {ADDON_ID} ]\n ACTION: {ACTION}\n  {logmsg}\n' , level)
     else:
         pass
 
@@ -161,9 +161,10 @@ if __name__ == '__main__':
             KNAME2 = ARGS[2].split('=')[0]
             KVALUE2 = ARGS[2].split(f'{KNAME2}=')[1]
             locals()[ACTION](KVALUE,KVALUE2)
-            
+            # f"{ACTION(KVALUE,KVALUE2)}"
         else:
             locals()[ACTION](KVALUE)
-    
+            # f"{ACTION(KVALUE2)}"
     else:
         locals()[ACTION]()
+        # f"{ACTION()}"
