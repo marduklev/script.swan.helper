@@ -35,7 +35,7 @@ def playlist_regainfocus(container_id,index):
     xbmc.sleep(100)
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
     xbmc.sleep(50)
-    xbmc.executebuiltin(f'setfocus({container_id},{index})')
+    xbmc.executebuiltin('setfocus(%s,%s)' % (container_id,index))
 
 def execute(): 
     # context_actions.py
