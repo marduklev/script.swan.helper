@@ -1,12 +1,10 @@
 # script.swan.helper
  = provide some functions for kodi xml skins
+ 
  NOTE:  i am still learning py and cross xbmc usecases
 
-## skin
- = usage 
- RunScript(script.swan.helper,action=*action definition,*parameter1 KEY*='*parameter1 VALUE*',*parameter2 KEY=*parameter2 VALUE)
- 
----
+## script actions for skinning skin
+
 
 | action              | param1<br>key1=value1                                                 | param2<br>key2=value2                                                                                      | example                                                                                                                                                                                                                                                                                     | description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 |---------------------|-----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -31,25 +29,25 @@
 
     example
 
-					<control type="panel" id="12345">
-					    <description>dynamic container provide playlistcontent</description>
-						<onfocus>SetProperty(playlist_itemcontrol,enable,home)</onfocus>
-						<onunfocus>ClearProperty(playlist_itemcontrol,home)</onunfocus>
-						.. 
-						<content>$VAR[playlistmusic]</content>
-					</control>
-					
-					<variable name="playlistmusic">
-						<value condition="string.isempty(window(home).property(playlist))">playlistmusic://</value>
-						<value>-</value>
-					</variable>
+		<control type="panel" id="12345">
+		    <description>dynamic container provide playlistcontent</description>
+			<onfocus>SetProperty(playlist_itemcontrol,enable,home)</onfocus>
+			<onunfocus>ClearProperty(playlist_itemcontrol,home)</onunfocus>
+			.. 
+			<content>$VAR[playlistmusic]</content>
+		</control>
+		
+		<variable name="playlistmusic">
+			<value condition="string.isempty(window(home).property(playlist))">playlistmusic://</value>
+			<value>-</value>
+		</variable>
     >    the custom container for playlist wont refresh properly till window reload or open playlistwindow, therefore using a variable to toggle between visible states to force a proper refresh n your skin
     >    
     >   the script set a window property  ''setproperty(playlist,update,home)'' when do queue,delete or switch functions, which can then be used to refresh the container content by using a variable
 				
 			
  - save currently active playlist : just activates window and send click to control 21 (save button) and set a window property  ''setproperty(addon_forcedaction,back,home)'' 
-
+example
     > if you dont wanna move back manually just add following onunload commands to 'dialogkeyboard.xml'
 	
 	    <onunload condition="String.IsEqual(Window(home).Property(addon_forcedaction),back)">Action(back)</onunload>
