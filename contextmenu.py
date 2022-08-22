@@ -15,13 +15,13 @@ def playlistitem_fn():
         if position1 == 0:
             position2 = size
         else:
-            position2 = int(xbmc.getInfoLabel('container(%s).currentitem' % container_id)) -2
+            position2 = int(xbmc.getInfoLabel('container({container_id}).currentitem')) -2
     
     elif METHOD == 'plus':
         if position1 == size:
             position2 = 0
         else:
-            position2 = xbmc.getInfoLabel('container(%s).currentitem' % container_id)
+            position2 = xbmc.getInfoLabel('container({container_id}).currentitem')
     
     if METHOD == 'minus' or METHOD == 'plus':
         xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Playlist.Swap", "params": { "playlistid": %s, "position1": %s, "position2": %s }, "id": 1}' % (PLAYLIST_ID,position1,position2))
@@ -38,15 +38,14 @@ def playlist_regainfocus(container_id,index):
     xbmc.executebuiltin(f'setfocus({container_id},{index})')
 
 def execute(): 
-    # context_actions.py
     if METHOD == 'playmedia_dir':
         if xbmc.getCondVisibility('!string.isequal(listitem.dbtype,artist)'):
             url = xbmc.getInfoLabel('listitem.folderpath')
-            xbmc.executebuiltin('playmedia(%s,isdir,1)' % url)
+            xbmc.executebuiltin('playmedia({url},isdir,1)')
         
         elif xbmc.getCondVisibility('string.isequal(listitem.dbtype,artist)'):
             artistid = xbmc.getInfoLabel('listitem.dbid')
-            xbmc.executebuiltin('playmedia(musicdb://artists/%s/-1/-2/?albumartistonly=false&amp;artistid=%s,isdir,1)' % (artistid,artistid))
+            xbmc.executebuiltin('playmedia(musicdb://artists/{artistid}/-1/-2/?albumartistonly=false&amp;artistid={artistid},isdir,1)')
     
     if METHOD == 'open_playlist':
         xbmc.executebuiltin('action(playlist)')
@@ -84,26 +83,16 @@ def playlist_queuing():
         xbmc.executeJSONRPC('{"jsonrpc": "2.0",  "id": 1, "method": "Playlist.Insert", "params": { "item": { "%s": "%s"}, "playlistid": %s, "position": %s}}' % (item,url,PLAYLIST_ID,index))
     
     if dbtype == 'song' or dbtype == 'album':
-        xbmc.executebuiltin('notification(%s %s by %s,  Added to Playlist at position %s,,%s)' % (dbtype,item_title,item_artist,index,item_thumb))
+        xbmc.executebuiltin('notification({dbtype} {item_title} by {item_artist},  Added to Playlist at position {index},,{item_thumb})')
     elif dbtype == 'artist':
-        xbmc.executebuiltin('notification($LOCALIZE[625] %s,  Added to Playlist at position %s,,%s)' % (item_artist,index,item_thumb))
+        xbmc.executebuiltin('notification($LOCALIZE[625] {item_artist},  Added to Playlist at position {index},,{item_thumb})')
     else:
-        xbmc.executebuiltin('notification($LOCALIZE[625] %s: %s,  Added to Playlist at position %s,,%s)' % (dbtype,item_label,index,item_thumb))    
+        xbmc.executebuiltin('notification($LOCALIZE[625] {dbtype}: {item_label},  Added to Playlist at position {index},,{item_thumb})')    
     
     if xbmc.getCondVisibility('!player.hasaudio'):
         xbmc.Player().play(PLAYLIST)
     
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
-
-def main():
-    if ACTION == 'queue':
-        playlist_queuing()
-
-    if ACTION == 'execute':
-        execute()
-    
-    if ACTION == 'playlistitem_fn':
-        playlistitem_fn()
 
 if __name__ == '__main__':
     ADDON = xbmcaddon.Addon()
@@ -116,4 +105,4 @@ if __name__ == '__main__':
     ACTION = sys.argv[1].split(',method=')[0]
     METHOD = sys.argv[1].split(',method=')[1]
     
-    main()
+    locals()[ACTION]()
