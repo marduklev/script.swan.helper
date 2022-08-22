@@ -95,16 +95,6 @@ def playlist_queuing():
     
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
 
-def main():
-    if ACTION == 'queue':
-        playlist_queuing()
-
-    if ACTION == 'execute':
-        execute()
-    
-    if ACTION == 'playlistitem_fn':
-        playlistitem_fn()
-
 if __name__ == '__main__':
     ADDON = xbmcaddon.Addon()
     ADDON_ID = ADDON.getAddonInfo('id')
@@ -116,4 +106,4 @@ if __name__ == '__main__':
     ACTION = sys.argv[1].split(',method=')[0]
     METHOD = sys.argv[1].split(',method=')[1]
     
-    main()
+    locals()[ACTION]()
