@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
+# from resources.lib.utils import log
+
 import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
+import json
 import urllib
-import sys
+import sys                               
 
 def get_trailer(folderpath="",play=False,plugin=False):
     f_check = []
@@ -16,7 +19,6 @@ def get_trailer(folderpath="",play=False,plugin=False):
         f_check = xbmcvfs.listdir(folderpath)[1]
         f_check = [s for s in f_check if "trailer" in s]
         
-
     if len(f_check) > 0:
         trailer = folderpath + f_check[0]
         xbmc.executebuiltin('SetProperty(listitemtrailer,%s,home)' % trailer)
@@ -31,9 +33,9 @@ def get_trailer(folderpath="",play=False,plugin=False):
             local_language = xbmc.getInfoLabel('System.Language')
             title = xbmc.getInfoLabel('listitem.title')
             query = "%s %s trailer" % (title,local_language)
-            result = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": { "limits": { "start" : 0, "end": 1 }, "directory": "plugin://plugin.video.youtube/kodion/search/query/?q=%s&search_type=videos", "media": "files"}, "id": 1}' % query )
             
-            trailer = result.split('"file":"')[1].split('","')[0]
+            result = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": { "limits": { "start" : 0, "end": 1 }, "directory": "plugin://plugin.video.youtube/kodion/search/query/?q=%s&search_type=videos", "media": "files"}, "id": 1}' % query )
+            trailer = json.loads(result)["result"]["files"][0]["file"]
             
             xbmc.executebuiltin('SetProperty(listitemtrailer,%s,home)' % trailer)
             
@@ -41,7 +43,7 @@ def get_trailer(folderpath="",play=False,plugin=False):
         xbmc.executebuiltin('SetProperty(trailer_isplaying,true,home)')
         xbmc.executebuiltin('playmedia(%s,1)' % trailer)
     
-    log('locals: %s' % locals())
+    log('ACTION: %s\n locals: %s' % (ACTION,locals()))
  
 def force_musicvideos():
     # this will not work when advancedsettings - set jsonrpc to compactoutput false
@@ -89,7 +91,7 @@ def playlist_playoffset():
     xbmc.executebuiltin('playlist.playoffset(%s)' % index)
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
     
-    log('locals: %s' % locals())
+    log('ACTION: %s\n  locals: %s' % (ACTION,locals()))
 
 def select():
     playlistid = 1 if xbmc.getCondVisibility('player.hasvideo') else 0
@@ -136,11 +138,12 @@ def select():
             xbmc.executebuiltin('notification($LOCALIZE[625] %s: %s,  Added to Playlist at position %s,,%s)' % (dbtype,item_label,index,item_thumb)) 
     
     xbmc.executebuiltin('clearproperty(playlist_updating,home)')
-    log('locals: %s' % locals())
+    log('ACTION: %s\n  locals: %s' % (ACTION,locals()))
 
 def textviewer(header='header',txt='txt'):
     DIALOG.textviewer(header,txt[2:-2])
     log('    heaer: %s\n    txt : %s' % header,txt)
+
 
 def log(logmsg):
     if ADDON.getSettingBool('debug_log') == True:

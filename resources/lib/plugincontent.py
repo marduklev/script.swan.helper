@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
+# info - https://romanvm.github.io/Kodistubs/_autosummary/xbmcplugin.html
+
+from resources.lib.utils import log
 
 import xbmc
 import xbmcplugin
 import xbmcgui
 
 import sys
+from urlparse import parse_qsl       
 import json
-
-from urlparse import parse_qsl
 
 
 class PluginContent:
-    
     params = {}
+    
     def __init__(self):
         self.params = dict(parse_qsl(sys.argv[2][1:]))
         self.main()
 
     def main(self):
         action = self.params.get("action")
-        getattr(self, action)()
         
-        # temp no loging
-        # try:
-            # getattr(self, action)()
-        # except:
-            # log('PLUGIN EXCEPTION : locals = %s' % locals())
+        try:
+            getattr(self, action)()
+        except:
+            log('PLUGIN EXCEPTION : locals = %s' % locals())
     
     def get_cast(self):
         dbtype = self.params["dbtype"]
@@ -62,8 +62,7 @@ class PluginContent:
             elif dbtype == "episode":
                 cast_list = json.loads(result)["result"]["episodedetails"]["cast"]
         
-        # log('%s\n   cast_list %s' % (locals(),cast_list))        
-        
+        log('%s\n   cast_list %s' % (locals(),cast_list))        
         for actor in cast_list:
             list_item = xbmcgui.ListItem(label=actor.get("name"), label2=actor.get("role"), offscreen=True)
             list_item.setArt({"thumb":actor.get("thumbnail")})
@@ -100,17 +99,3 @@ class PluginContent:
         fake_view_id = xbmc.getInfoLabel('window.property(viewid)')
         
         xbmc.executebuiltin('SetFocus(%s),%s,absolute)' % (fake_view_id,absolutepos))
-
-
-    def log(logmsg):
-        if ADDON.getSettingBool('debug_log') == True:
-            level = xbmc.LOGNOTICE
-            xbmc.log('[ %s ]\n ACTION: %s\n  \n%s\n' % (ADDON_ID,ACTION,logmsg), level)
-        else:
-            pass
-        return
-        
-
-
-if __name__ == "__main__":
-    PluginContent()
