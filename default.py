@@ -13,17 +13,14 @@ from resources.lib.utils import log
 
 
 def get_trailer(folderpath="",play=False,plugin=False):
-    
     f_check = []
     trailer = None
     
     if plugin == False:
-        
         f_check = xbmcvfs.listdir(folderpath)[1]
         f_check = [s for s in f_check if "trailer" in s]
     
     if len(f_check) > 0:
-        # need check for formatting issues \\
         trailer = folderpath + f_check[0]
         xbmc.executebuiltin(f'SetProperty(listitemtrailer,{trailer},home)')
     
@@ -39,8 +36,6 @@ def get_trailer(folderpath="",play=False,plugin=False):
             query = f"{title} {local_language} trailer"
             
             result = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": { "limits": { "start" : 0, "end": 1 }, "directory": "plugin://plugin.video.youtube/kodion/search/query/?q=%s&search_type=videos", "media": "files"}, "id": 1}' % query )
-            
-            # i think error correction would'nt harm, but hey its working
             trailer = json.loads(result)["result"]["files"][0]["file"]
             
             xbmc.executebuiltin(f'SetProperty(listitemtrailer,{trailer},home)')

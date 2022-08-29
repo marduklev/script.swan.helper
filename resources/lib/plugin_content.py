@@ -43,7 +43,7 @@ class PluginContent:
             for index in range(0,len(movies_from_set)-1):
                 dbid = movie_id_list[index]
                 result = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "VideoLibrary.GetMovieDetails", "params": {"movieid": %s, "properties": ["cast"]}, "id": 1} ' % dbid)
-                cast_l_cache = json.loads(result)["result"]["moviedetails"]["cast"][:5]
+                cast_l_cache = json.loads(result)["result"]["moviedetails"]["cast"][:7]
                 cast_list.extend(cast_l_cache)
             
             cast_l_cache = []
