@@ -31,10 +31,6 @@ class PluginContent:
         dbtype = self.params["dbtype"]
         dbid = self.params["dbid"]
         
-        # later auto detect
-        # dbtype = xbmc.getInfoLabel('container().listitem.dbtype')
-        # dbid = xbmc.getInfoLabel('container().listitem.dbid')
-        
         if dbtype == "set":
             result = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "VideoLibrary.GetMovieSetDetails", "params": {"setid": %s}, "id": 1} ' % (dbid))
             movies_from_set = json.loads(result)["result"]["setdetails"]["movies"]
@@ -62,19 +58,44 @@ class PluginContent:
             if dbtype == "tvshow":
                 cast_list = json.loads(result)["result"]["tvshowdetails"]["cast"]
             elif dbtype == "movie":
-               cast_list = json.loads(result)["result"]["moviedetails"]["cast"]
+                cast_list = json.loads(result)["result"]["moviedetails"]["cast"]
             elif dbtype == "episode":
                 cast_list = json.loads(result)["result"]["episodedetails"]["cast"]
         
         log(f'{locals()}\n   cast_list {cast_list}')        
-        # process listing with the results ,  maybe need look here too https://github.com/xbmc/xbmc/pull/19459#issuecomment-806450382
+        
         for actor in cast_list:
             list_item = xbmcgui.ListItem(label=actor.get("name"), label2=actor.get("role"), offscreen=True)
             list_item.setArt({"thumb":actor.get("thumbnail")})
-            
-            cast_list_names = [(actor.get("name"))]
-            list_item.setArt({"thumb":actor.get("thumbnail")})
-            xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url="", listitem=list_item, isFolder=True)
+            xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url="", listitem=list_item, isFolder=False, totalItems=0)
                 
-        # finish it
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    
+    def get_alphabetbar(self):
+        if xbmc.getInfoLabel('container.numitems'):
+            all_letters = []
+            letter_item_dict ={}
+            
+            for i in range(int(xbmc.getInfoLabel('container.numitems'))):
+                all_letters.append(xbmc.getInfoLabel("ListItemAbsolute(%s).SortLetter" % i).upper())
+                letter_item = all_letters[i]
+                if letter_item not in letter_item_dict:
+                    letter_item_dict[f'{all_letters[i]}'] = i
+            
+            for key_item in list(letter_item_dict):
+                listitem = xbmcgui.ListItem(label=key_item)
+                offset = letter_item_dict[f"{key_item}"]
+                log(f'key_item is {key_item}')
+                lipath = f"plugin://script.swan.helper/?action=jumpabsolute&id={offset}"
+                xbmcplugin.addDirectoryItem(int(sys.argv[1]), lipath, listitem, isFolder=False)
+        
+        xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
+        
+    def jumpabsolute(self):
+        xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]), succeeded=False, listitem=xbmcgui.ListItem())
+        
+        absolutepos = self.params.get("id")
+        # didnt found any good way to get view id, than set label in skin
+        fake_view_id = xbmc.getInfoLabel('window.property(viewid)')
+        
+        xbmc.executebuiltin(f'SetFocus({fake_view_id},{absolutepos},absolute)')
