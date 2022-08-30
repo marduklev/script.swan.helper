@@ -1,5 +1,7 @@
 .gitattributes
 .gitignore
+.pyo
+.pyc
 _xbt\
 changelog.txt
 swan_info.md
