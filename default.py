@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-# from resources.lib.utils import log
+from resources.lib.utils import log
 
 import xbmc
 import xbmcaddon
@@ -9,8 +8,9 @@ import xbmcvfs
 
 import json
 import urllib
-import sys                               
+import sys
 
+    
 def get_trailer(folderpath="",play=False,plugin=False):
     f_check = []
     trailer = None
@@ -20,6 +20,7 @@ def get_trailer(folderpath="",play=False,plugin=False):
         f_check = [s for s in f_check if "trailer" in s]
         
     if len(f_check) > 0:
+        # need check for formatting issues \\
         trailer = folderpath + f_check[0]
         xbmc.executebuiltin('SetProperty(listitemtrailer,%s,home)' % trailer)
         
@@ -33,21 +34,17 @@ def get_trailer(folderpath="",play=False,plugin=False):
             local_language = xbmc.getInfoLabel('System.Language')
             title = xbmc.getInfoLabel('listitem.title')
             query = "%s %s trailer" % (title,local_language)
-            
             result = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": { "limits": { "start" : 0, "end": 1 }, "directory": "plugin://plugin.video.youtube/kodion/search/query/?q=%s&search_type=videos", "media": "files"}, "id": 1}' % query )
             trailer = json.loads(result)["result"]["files"][0]["file"]
-            
             xbmc.executebuiltin('SetProperty(listitemtrailer,%s,home)' % trailer)
             
     if play == True and trailer is not None:
         xbmc.executebuiltin('SetProperty(trailer_isplaying,true,home)')
         xbmc.executebuiltin('playmedia(%s,1)' % trailer)
     
-    log('ACTION: %s\n locals: %s' % (ACTION,locals()))
+    log('ACTION: %s\n  locals: %s' % (ACTION,locals()))
  
 def force_musicvideos():
-    # this will not work when advancedsettings - set jsonrpc to compactoutput false
-    # may addon/skinsettigs  setting enable youtube fallback
     artist_id = xbmc.getInfoLabel('container().listItem.artist')
     # viewmode = xbmc.getInfoLabel('Container.Viewmode')                
     exist_results = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "VideoLibrary.GetMusicvideos", "params": { "filter": {"field": "artist", "operator": "is", "value": "%s"}, "limits": { "start" : 0, "end": 1 }, "properties" : ["title"] }, "id": "libMusicVideos"} ' % artist_id).find('"total":0')
@@ -59,26 +56,27 @@ def force_musicvideos():
         
         url = 'plugin://plugin.video.youtube/search/?hide_folders=true&amp;q=' + artist_id + '%2B%0Aofficial%2B%0Amusicvideos'
         xbmc.executebuiltin( "activatewindow(videos,%s,return)" % url)
+        # xbmc.executebuiltin( f"Container.SetViewMode({viewmode})" )
     
     else:
         DIALOG.textviewer('Sorry', 'No Musicvideos by %s in your library' % artist_id )
     
-    log('locals: %s' % locals())
+    log('ACTION: %s\n  locals: %s' % (ACTION,locals()))
     
 def decode(source=None,property='decoded_string'):
     result = urllib.url2pathname(source)
     xbmc.executebuiltin("SetProperty(%s,%s,home)" % (property,result))
-    log('Param1: %s\n Param1 value: %s\n param2: %s\n param2 value: %s \n     result is : %s ' % (KNAME,KVALUE,KNAME2,KVALUE2,result))
+    log('ACTION: %s\n  Param1: %s\n Param1 value: %s\n param2: %s\n param2 value: %s \n     result is : %s ' % (ACTION,KNAME,KVALUE,KNAME2,KVALUE2,result))
 
 def encode(source=None,property='encoded_string'):
     result = urllib.pathname2url(source)
     xbmc.executebuiltin("SetProperty(%s,%s,home)" % (property,result))
-    log('Param1: %s\n Param1 value: %s\n param2: %s\n param2 value: %s \n     result is : %s ' % (KNAME,KVALUE,KNAME2,KVALUE2,result))
+    log('ACTION: %s\n  Param1: %s\n Param1 value: %s\n param2: %s\n param2 value: %s \n     result is : %s ' % (ACTION,KNAME,KVALUE,KNAME2,KVALUE2,result))
 
 def checkexist(file=None,property='filesearch_result'):
     if xbmcvfs.exists(file):
         xbmc.executebuiltin("SetProperty(%s,%s,home)" % (property,file))
-    log('Param1: %s\n Param1 value: %s\n param2: %s\n param2 value: %s ' % (KNAME,KVALUE,KNAME2,KVALUE2))
+    log('ACTION: %s\n  Param1: %s\n Param1 value: %s\n param2: %s\n param2 value: %s ' % (ACTION,KNAME,KVALUE,KNAME2,KVALUE2))
 
 def playlist_playoffset():
     xbmc.executebuiltin('setproperty(playlist_updating,true,home)')
@@ -142,15 +140,8 @@ def select():
 
 def textviewer(header='header',txt='txt'):
     DIALOG.textviewer(header,txt[2:-2])
-    log('    heaer: %s\n    txt : %s' % header,txt)
+    log('ACTION: %s\n  heaer: %s\n    txt : %s' % (ACTION,header,txt))
 
-
-def log(logmsg):
-    if ADDON.getSettingBool('debug_log') == True:
-        level = xbmc.LOGNOTICE
-        xbmc.log('[ %s ]\n ACTION: %s\n  \n%s\n' % (ADDON_ID,ACTION,logmsg), level)
-    else:
-        pass
 
 if __name__ == '__main__':
      
