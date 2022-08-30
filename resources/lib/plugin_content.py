@@ -16,9 +16,9 @@ class PluginContent:
     params = {}
     
     def __init__(self):
-        self.params = dict(urllib.parse.parse_qsl(sys.argv[2].replace('?', '').lower()))
+        self.params = dict(urllib.parse.parse_qsl(sys.argv[2][1:]))
         self.main()
-
+    
     def main(self):
         action = self.params.get("action")
         
@@ -63,13 +63,13 @@ class PluginContent:
                 cast_list = json.loads(result)["result"]["episodedetails"]["cast"]
         
         log(f'{locals()}\n   cast_list {cast_list}')        
-        
         for actor in cast_list:
             list_item = xbmcgui.ListItem(label=actor.get("name"), label2=actor.get("role"), offscreen=True)
             list_item.setArt({"thumb":actor.get("thumbnail")})
             xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url="", listitem=list_item, isFolder=False, totalItems=0)
                 
         xbmcplugin.endOfDirectory(int(sys.argv[1]))
+    
     
     def get_alphabetbar(self):
         if xbmc.getInfoLabel('container.numitems'):
@@ -80,22 +80,21 @@ class PluginContent:
                 all_letters.append(xbmc.getInfoLabel("ListItemAbsolute(%s).SortLetter" % i).upper())
                 letter_item = all_letters[i]
                 if letter_item not in letter_item_dict:
-                    letter_item_dict[f'{all_letters[i]}'] = i
+                    letter_item_dict[all_letters[i]] = i
             
             for key_item in list(letter_item_dict):
                 listitem = xbmcgui.ListItem(label=key_item)
-                offset = letter_item_dict[f"{key_item}"]
-                log(f'key_item is {key_item}')
+                offset = letter_item_dict[key_item]
                 lipath = f"plugin://script.swan.helper/?action=jumpabsolute&id={offset}"
                 xbmcplugin.addDirectoryItem(int(sys.argv[1]), lipath, listitem, isFolder=False)
         
         xbmcplugin.endOfDirectory(handle=int(sys.argv[1]))
-        
+    
+    
     def jumpabsolute(self):
         xbmcplugin.setResolvedUrl(handle=int(sys.argv[1]), succeeded=False, listitem=xbmcgui.ListItem())
         
         absolutepos = self.params.get("id")
-        # didnt found any good way to get view id, than set label in skin
+        # didnt found any good way to get view id, than set label in skin, except xbmc.sleep
         fake_view_id = xbmc.getInfoLabel('window.property(viewid)')
-        
         xbmc.executebuiltin(f'SetFocus({fake_view_id},{absolutepos},absolute)')

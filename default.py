@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from resources.lib.utils import log                          
 
 import xbmc
 import xbmcaddon
@@ -8,8 +9,6 @@ import xbmcvfs
 import json
 import urllib.parse
 import sys
-
-from resources.lib.utils import log
 
 
 def get_trailer(folderpath="",play=False,plugin=False):
@@ -21,6 +20,7 @@ def get_trailer(folderpath="",play=False,plugin=False):
         f_check = [s for s in f_check if "trailer" in s]
     
     if len(f_check) > 0:
+        # need check for formatting issues \\
         trailer = folderpath + f_check[0]
         xbmc.executebuiltin(f'SetProperty(listitemtrailer,{trailer},home)')
     
@@ -34,10 +34,8 @@ def get_trailer(folderpath="",play=False,plugin=False):
             local_language = xbmc.getInfoLabel('System.Language')
             title = xbmc.getInfoLabel('listitem.title')
             query = f"{title} {local_language} trailer"
-            
             result = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": { "limits": { "start" : 0, "end": 1 }, "directory": "plugin://plugin.video.youtube/kodion/search/query/?q=%s&search_type=videos", "media": "files"}, "id": 1}' % query )
             trailer = json.loads(result)["result"]["files"][0]["file"]
-            
             xbmc.executebuiltin(f'SetProperty(listitemtrailer,{trailer},home)')
             
     if play == True and trailer is not None:
@@ -47,8 +45,6 @@ def get_trailer(folderpath="",play=False,plugin=False):
     log(f'ACTION: {ACTION}\n locals: {locals()}')
  
 def force_musicvideos():
-    # this will not work when advancedsettings - set jsonrpc to compactoutput false
-    # may addon/skinsettigs  setting enable youtube fallback
     artist_id = xbmc.getInfoLabel('container().listItem.artist')
     # viewmode = xbmc.getInfoLabel('Container.Viewmode')
     exist_results = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "VideoLibrary.GetMusicvideos", "params": { "filter": {"field": "artist", "operator": "is", "value": "%s"}, "limits": { "start" : 0, "end": 1 }, "properties" : ["title"] }, "id": "libMusicVideos"} ' % artist_id).find('"total":0')
@@ -140,7 +136,6 @@ def select():
 def textviewer(header='header',txt='txt'):
     DIALOG.textviewer(header,txt[2:-2])
     log(f'ACTION: {ACTION} \n    heaer: {header}\n    txt : {txt}')
-
 
 
 if __name__ == '__main__':
