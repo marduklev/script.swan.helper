@@ -64,12 +64,12 @@ def force_musicvideos():
     log('ACTION: %s\n  locals: %s' % (ACTION,locals()))
     
 def decode(source=None,property='decoded_string'):
-    result = urllib.url2pathname(source)
+    result = urllib.unquote(source)
     xbmc.executebuiltin("SetProperty(%s,%s,home)" % (property,result))
     log('ACTION: %s\n  Param1: %s\n Param1 value: %s\n param2: %s\n param2 value: %s \n     result is : %s ' % (ACTION,KNAME,KVALUE,KNAME2,KVALUE2,result))
 
 def encode(source=None,property='encoded_string'):
-    result = urllib.pathname2url(source)
+    result = urllib.quote(source)
     xbmc.executebuiltin("SetProperty(%s,%s,home)" % (property,result))
     log('ACTION: %s\n  Param1: %s\n Param1 value: %s\n param2: %s\n param2 value: %s \n     result is : %s ' % (ACTION,KNAME,KVALUE,KNAME2,KVALUE2,result))
 

@@ -1,2 +1,3 @@
 skinupdater.ini
 *.pyo
+*.pyc
