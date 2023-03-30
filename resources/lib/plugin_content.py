@@ -84,7 +84,7 @@ class PluginContent:
             
             for key_item in list(letter_item_dict):
                 listitem = xbmcgui.ListItem(label=key_item)
-                offset = letter_item_dict[key_item]
+                offset = letter_item_dict.get("%s" % key_item)
                 lipath = "plugin://script.swan.helper/?action=jumpabsolute&id=%s" % offset
                 xbmcplugin.addDirectoryItem(int(sys.argv[1]), lipath, listitem, isFolder=False)
         
