@@ -10,6 +10,39 @@ import json
 import urllib.parse
 import sys
 
+# blur
+import os
+from PIL import ImageFilter, Image
+import time # debug time
+
+def blur(img_source,prop_name="blurredimg",radius=int(15)):
+    # ADDON_DATA_IMG_PATH = os.path.join(xbmcvfs.translatePath(f'special://profile//addon_data//{ADDON_ID}//img'))
+    ADDON_DATA_IMG_PATH = xbmcvfs.translatePath(f'special://profile//addon_data/{ADDON_ID}/img')
+    
+    # if not os.path.exists(ADDON_DATA_IMG_PATH):
+    if not xbmcvfs.exists(ADDON_DATA_IMG_PATH):
+        # os.makedirs(ADDON_DATA_IMG_PATH)
+        xbmcvfs.mkdir(ADDON_DATA_IMG_PATH)
+    else:
+        pass
+    
+    # foldername  is bad idea,   also used foldername as radius is not handled via os.path.join()
+    # target_fn = md5hash(xbmc.getInfoLabel('listitem.label')) + '.png'
+    target_fn = xbmc.getInfoLabel('listitem.foldername') + '-blurredart.png'
+    target_fnp = f'{ADDON_DATA_IMG_PATH}\\{radius}\\{target_fn}'
+    # target_fnp = os.path.join(ADDON_DATA_IMG_PATH, target_fn)
+    
+    if not xbmcvfs.exists(target_fnp):
+        xbmcvfs.copy(img_source, target_fnp)
+        image = Image.open(target_fnp)
+        # image.thumbnail((256, 256), Image.ANTIALIAS)                                             
+        image = image.filter(ImageFilter.GaussianBlur(radius)).save(target_fnp)
+    else:
+        pass
+    
+    xbmc.executebuiltin(f'SetProperty({prop_name},{target_fnp},home)')
+    
+    log(f'ACTION: {ACTION}\n  locals: {locals()}')
 
 def get_trailer(folderpath="",play=False,plugin=False):
     f_check = []
@@ -146,7 +179,7 @@ if __name__ == '__main__':
     
     ARGS = sys.argv[1:]
     ACTION = sys.argv[1].split('action=')[1]
-   
+    
     if len(ARGS) > 1:
         KNAME = ARGS[1].split('=')[0]
         KVALUE = ARGS[1].split(f'{KNAME}=')[1][2:-2]
