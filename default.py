@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from resources.lib.utils import log                          
+from resources.lib.utils import *
 
 import xbmc
 import xbmcaddon
@@ -13,9 +13,10 @@ import sys
 # blur
 import os
 from PIL import ImageFilter, Image
-import time # debug time
 
 def blur(img_source,prop_name="blurredimg",radius=int(15)):
+    
+    # reminder : better outsourcing to sub function, dont need to check everytime when run 'blur' fn ?
     # ADDON_DATA_IMG_PATH = os.path.join(xbmcvfs.translatePath(f'special://profile//addon_data//{ADDON_ID}//img'))
     ADDON_DATA_IMG_PATH = xbmcvfs.translatePath(f'special://profile//addon_data/{ADDON_ID}/img')
     
@@ -26,24 +27,39 @@ def blur(img_source,prop_name="blurredimg",radius=int(15)):
     else:
         pass
     
-    # foldername  is bad idea,   also used foldername as radius is not handled via os.path.join()
-    # target_fn = md5hash(xbmc.getInfoLabel('listitem.label')) + '.png'
-    target_fn = xbmc.getInfoLabel('listitem.foldername') + '-blurredart.png'
-    target_fnp = f'{ADDON_DATA_IMG_PATH}\\{radius}\\{target_fn}'
+    '''
+     foldername  is bad idea, because whats when user dont use folders containing single movie,   also used foldername as radius is not handled via os.path.join(),and whats when main fanart changed - use fsize as additional identifyer ?
+      - blur usecases - use identifyer an call identifyer (spotlight=hardcoded_strong, userdefined=globalbackground ~ skin.string, shutdownmenu=hardcoded_soft)  , BUT use radius string as identifyer / folderlookup - 3 folder , when change user radius, just del the one which is not hardcoded usecase and not doubled
+                      - use md5 hash, as ident, will not work if artwork changed
+      - blur cache    - identifyer=radius indicate cache folder
+    '''
+    
+    '''
+    radius 100 = spotlight
+    radius 15 = shutdown menu = default
+    radius unknow = user defined
+    '''
+    
+    # target_fn = xbmc.getInfoLabel('listitem.foldername') + '-blurredart.png'
+    target_fn = md5hash(img_source) + '.png' # result in huge cahce when fanart change, old img will be persistent
+    
+    target_fnp = f'{ADDON_DATA_IMG_PATH}\\{int(radius)}\\{target_fn}'
     # target_fnp = os.path.join(ADDON_DATA_IMG_PATH, target_fn)
+    
     
     if not xbmcvfs.exists(target_fnp):
         xbmcvfs.copy(img_source, target_fnp)
         image = Image.open(target_fnp)
         # image.thumbnail((256, 256), Image.ANTIALIAS)                                             
-        image = image.filter(ImageFilter.GaussianBlur(radius)).save(target_fnp)
+        image = image.filter(ImageFilter.GaussianBlur(int(radius))).save(target_fnp)
     else:
         pass
     
-    xbmc.executebuiltin(f'SetProperty({prop_name},{target_fnp},home)')
+    set_winprop(prop_name,target_fnp)
     
-    log(f'ACTION: {ACTION}\n  locals: {locals()}')
-
+    # log(f'ACTION: {ACTION}\n  locals: {locals()}')
+    log(f'ADDON_DATA_IMG_PATH = {ADDON_DATA_IMG_PATH} \n img_source = {img_source} \n prop_name = {prop_name} \n radius = {int(radius)}')
+    
 def get_trailer(folderpath="",play=False,plugin=False):
     f_check = []
     trailer = None
@@ -55,13 +71,13 @@ def get_trailer(folderpath="",play=False,plugin=False):
     if len(f_check) > 0:
         # need check for formatting issues \\
         trailer = folderpath + f_check[0]
-        xbmc.executebuiltin(f'SetProperty(listitemtrailer,{trailer},home)')
+        set_winprop('listitemtrailer',trailer)
     
     elif len(f_check) == 0 and xbmc.getCondVisibility('!string.isequal(system.internetstate,$LOCALIZE[13297])'):
         
         if xbmc.getCondVisibility('!string.isempty(listitem.trailer)'):
             trailer = xbmc.getInfoLabel('listitem.trailer')
-            xbmc.executebuiltin(f'SetProperty(listitemtrailer,{trailer},home)')
+            set_winprop('listitemtrailer',trailer)
         
         elif xbmc.getCondVisibility('skin.hassetting(trailer_yt_fallback) + system.hasaddon(plugin.video.youtube)'):
             local_language = xbmc.getInfoLabel('System.Language')
@@ -69,10 +85,10 @@ def get_trailer(folderpath="",play=False,plugin=False):
             query = f"{title} {local_language} trailer"
             result = xbmc.executeJSONRPC(' {"jsonrpc": "2.0", "method": "Files.GetDirectory", "params": { "limits": { "start" : 0, "end": 1 }, "directory": "plugin://plugin.video.youtube/kodion/search/query/?q=%s&search_type=videos", "media": "files"}, "id": 1}' % query )
             trailer = json.loads(result)["result"]["files"][0]["file"]
-            xbmc.executebuiltin(f'SetProperty(listitemtrailer,{trailer},home)')
+            set_winprop('listitemtrailer',trailer)
             
     if play == True and trailer is not None:
-        xbmc.executebuiltin('SetProperty(trailer_isplaying,true,home)')
+        set_winprop('trailer_isplaying','true')
         xbmc.executebuiltin(f'playmedia({trailer},1)')
     
     log(f'ACTION: {ACTION}\n locals: {locals()}')
@@ -93,21 +109,21 @@ def force_musicvideos():
     
 def decode(source=None,property='decoded_string'):
     result = urllib.parse.unquote(source)
-    xbmc.executebuiltin(f"SetProperty({property},{result},home)")
+    set_winprop(property,result)
     log(f'ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
 
 def encode(source=None,property='encoded_string'):
     result = urllib.parse.quote(source.encode())
-    xbmc.executebuiltin(f"SetProperty({property},{result},home)")
+    set_winprop(property,result)
     log(f'ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
 
 def checkexist(file=None,property='filesearch_result'):
     if xbmcvfs.exists(file):
-        xbmc.executebuiltin(f"SetProperty({property},{file},home)")
+        set_winprop(property,file)
     log(f'ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2}')
 
 def playlist_playoffset():
-    xbmc.executebuiltin('setproperty(playlist_updating,true,home)')
+    set_winprop('playlist_updating','true')
     playlistid = 1 if xbmc.getCondVisibility('player.hasvideo') else 0
     playlist = xbmc.PlayList(playlistid)   
     container_id = xbmc.getInfoLabel('system.currentcontrolid')
@@ -115,7 +131,7 @@ def playlist_playoffset():
     selected = int(xbmc.getInfoLabel('container(%s).currentitem' % container_id)) - 1
     index = int(selected) - int(current)
     xbmc.executebuiltin(f'playlist.playoffset({index})')
-    xbmc.executebuiltin('clearproperty(playlist_updating,home)')
+    clear_winprop('playlist_updating')
     
     log(f'ACTION: {ACTION}\n  locals: {locals()}')
 
@@ -123,7 +139,7 @@ def select():
     playlistid = 1 if xbmc.getCondVisibility('player.hasvideo') else 0
     playlist = xbmc.PlayList(0)
     
-    xbmc.executebuiltin('setproperty(playlist_updating,true,home)')
+    set_winprop('playlist_updating','true')
     
     dbid = xbmc.getInfoLabel('listItem.dbid') if xbmc.getCondVisibility('!string.isempty(listitem.dbid) + !string.isequal(listitem.dbtype,year)') else 0
     dbtype = xbmc.getInfoLabel('listItem.dbtype') if xbmc.getCondVisibility('!string.isempty(listitem.dbtype)') else None
@@ -163,7 +179,7 @@ def select():
         else:
             xbmc.executebuiltin('notification($LOCALIZE[625] %s: %s,  Added to Playlist at position %s,,%s)' % (dbtype,item_label,index,item_thumb)) 
     
-    xbmc.executebuiltin('clearproperty(playlist_updating,home)')
+    clear_winprop('playlist_updating')
     log(f'ACTION: {ACTION}\n  locals: {locals()}')
 
 def textviewer(header='header',txt='txt'):
@@ -180,17 +196,32 @@ if __name__ == '__main__':
     ARGS = sys.argv[1:]
     ACTION = sys.argv[1].split('action=')[1]
     
+    # need simpler way to auto-handle args !!!
     if len(ARGS) > 1:
         KNAME = ARGS[1].split('=')[0]
-        KVALUE = ARGS[1].split(f'{KNAME}=')[1][2:-2]
+        KVALUE1 = ARGS[1].split(f'{KNAME}=')[1][2:-2]
         
         if len(ARGS) > 2:
             KNAME2 = ARGS[2].split('=')[0]
             KVALUE2 = ARGS[2].split(f'{KNAME2}=')[1]
-            locals()[ACTION](KVALUE,KVALUE2)
+            
+            if len(ARGS) > 3:
+                KNAME3 = ARGS[3].split('=')[0]
+                KVALUE3 = ARGS[3].split(f'{KNAME3}=')[1]
+                
+                if len(ARGS) > 4:
+                    KNAME4 = ARGS[4].split('=')[0]
+                    KVALUE4 = ARGS[4].split(f'{KNAME4}=')[1]
+                    locals()[ACTION](KVALUE1,KVALUE2,KVALUE3,KVALUE4)
+                
+                else:
+                    locals()[ACTION](KVALUE1,KVALUE2,KVALUE3)
+            
+            else:
+                locals()[ACTION](KVALUE1,KVALUE2)
             
         else:
-            locals()[ACTION](KVALUE)
+            locals()[ACTION](KVALUE1)
     
     else:
         locals()[ACTION]()
