@@ -110,17 +110,17 @@ def force_musicvideos():
 def decode(source=None,property='decoded_string'):
     result = urllib.parse.unquote(source)
     set_winprop(property,result)
-    log(f'ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
+    log(f'ACTION: {ACTION}\n Param1: {KNAME1}\n Param1 value: {KVALUE1}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
 
 def encode(source=None,property='encoded_string'):
     result = urllib.parse.quote(source.encode())
     set_winprop(property,result)
-    log(f'ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
+    log(f'ACTION: {ACTION}\n Param1: {KNAME1}\n Param1 value: {KVALUE1}\n param2: {KNAME2}\n param2 value: {KVALUE2} \n     result is : {result} ')
 
 def checkexist(file=None,property='filesearch_result'):
     if xbmcvfs.exists(file):
         set_winprop(property,file)
-    log(f'ACTION: {ACTION}\n Param1: {KNAME}\n Param1 value: {KVALUE}\n param2: {KNAME2}\n param2 value: {KVALUE2}')
+    log(f'ACTION: {ACTION}\n Param1: {KNAME1}\n Param1 value: {KVALUE1}\n param2: {KNAME2}\n param2 value: {KVALUE2}')
 
 def playlist_playoffset():
     set_winprop('playlist_updating','true')
@@ -198,8 +198,8 @@ if __name__ == '__main__':
     
     # need simpler way to auto-handle args !!!
     if len(ARGS) > 1:
-        KNAME = ARGS[1].split('=')[0]
-        KVALUE1 = ARGS[1].split(f'{KNAME}=')[1][2:-2]
+        KNAME1 = ARGS[1].split('=')[0]
+        KVALUE1 = ARGS[1].split(f'{KNAME1}=')[1][2:-2]
         
         if len(ARGS) > 2:
             KNAME2 = ARGS[2].split('=')[0]
